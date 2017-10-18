@@ -1,6 +1,74 @@
 # coding: utf8
 import os
 import numpy as np
+import matplotlib.pyplot as plt
+
+def PCACovariance():
+    """
+        Computes the PCA of the data matrix X.
+        N observations of dimensionality d.
+        Dimension along the rows and observations along the columns.
+        """
+    
+    N = 1000
+    
+    mean = [0,1]
+    sigma = [[2,0.0],[0.0,1.0]]
+    X = np.random.multivariate_normal(mean, sigma, N).T
+    
+    #Remove the mean
+    one = np.ones((N,1)) #Column vector full of ones
+    mu = 1.0/N*X.dot(one)
+    XCentered = X-mu.dot(one.T)
+    
+    #Compute the covariance matrix and its eigen decomposition
+    #U contains the eigenvectors of the covariance matrix in its rows
+    eigValues, U = np.linalg.eig(XCentered.dot(XCentered.T))
+    Lambda = np.diag(np.array(eigValues))
+   
+    #Plot
+    fig, ax = plt.subplots()
+    ax.plot(XCentered[0,:], XCentered[1,:], '.')
+    
+    #Plot axis scaled by sqrt(eigenvalues)
+    origin = [0], [0] #Origin
+    plt.quiver(*origin, np.sqrt(Lambda[0,0])*U[0,:], np.sqrt(Lambda[1,1])*U[1,:], color=['r','b','g'], scale=21)
+    plt.axis('equal')
+    plt.show()
+
+def PCA():
+    """
+        Computes the PCA of the data matrix X.
+        N observations of dimensionality d.
+        Dimension along the rows and observations along the columns.
+    """
+    
+    """N = 1000
+    
+    mean = [0,1]
+    sigma = [[1,-1],[-1,10]]
+    X = np.random.multivariate_normal(mean, sigma, N).T
+    
+    #Remove the mean
+    print(np.shape(X))
+
+    #PCA
+    #The number of dimensions is too low here compared to the observations
+    #Hence computing the eigen decomposition of the covariance matrix XX^T would be faster
+    #However in real world problems, d>>N and computing he eigen decomposition of the covariance matrix is very expensive
+    #Therefore the eigendecomposition of X^TX is computed and then the eigenvectors of XX^T are recovered.
+    #Eigen values of XX^T
+    eigValues, V = np.linalg.eig(X.dot(X.T))
+    Lambda = np.diag(eigValues)
+    print(eigValues)
+    #The eigenvectors of XX^T are related by U = XVeigValues^-1/2
+    U = X.dot(V).dot(np.sqrt(np.linalg.inverse(Lambda)))
+    print(U.shape)
+    
+    fig, ax = plt.subplots()
+    ax.plot(X[0,:], X[1,:], '.')
+    plt.axis('equal')
+    plt.show()"""
 
 def QRDecomposition(A):
     """
@@ -68,12 +136,18 @@ def comparisonEigenvalues(iterations):
     difference = np.sqrt(np.sum(np.square(eigenvaluesNumpy-eigenvaluesQR)))
     print("Difference between eigenvalues : %f" % difference)
 
-def main():
+def QRDecompositionExample():
+    """
+        Example of how to use the QR decomposition.
+    """
     A = np.array([[1,1,0],[1,2,1],[-2,-3,1]])
     print(A)
     Q,R = QRDecomposition(A)
     print(Q)
     print(R)
+
+def main():
+    PCACovariance()
 
 if __name__ == "__main__":
     main()
